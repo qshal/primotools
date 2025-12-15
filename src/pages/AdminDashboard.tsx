@@ -7,7 +7,7 @@ import { ProductFormModal } from '@/components/ProductFormModal';
 import { EmptyState } from '@/components/EmptyState';
 import { AdminLogin } from '@/components/AdminLogin';
 import { DevHelper } from '@/components/DevHelper';
-import { CodeImporter } from '@/components/CodeImporter';
+import { CodeImportModal } from '@/components/CodeImportModal';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import {
@@ -20,14 +20,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Plus, Package } from 'lucide-react';
+import { Plus, Package, Code } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export const AdminDashboard = () => {
-  const { products, addProduct, updateProduct, deleteProduct, maxProducts, canAddMore } = useProducts();
+  const { products, addProduct, updateProduct, deleteProduct, importProducts, maxProducts, canAddMore } = useProducts();
   const { isAuthenticated } = useAuth();
   const { toast } = useToast();
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isCodeImportOpen, setIsCodeImportOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | undefined>();
   const [deletingProductId, setDeletingProductId] = useState<string | null>(null);
 
@@ -87,6 +88,22 @@ export const AdminDashboard = () => {
     setEditingProduct(undefined);
   };
 
+  const handleCodeImport = (newProducts: Product[]) => {
+    const success = importProducts(newProducts);
+    if (success) {
+      toast({
+        title: 'Products imported successfully',
+        description: `${newProducts.length} products have been imported to your catalog.`,
+      });
+    } else {
+      toast({
+        title: 'Import failed',
+        description: `Cannot import more than ${maxProducts} products.`,
+        variant: 'destructive',
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen pt-16 sm:pt-20 relative overflow-hidden">
       {/* Background decorative elements */}
@@ -116,27 +133,36 @@ export const AdminDashboard = () => {
           </p>
         </motion.div>
 
-        {/* Code Manager Section */}
-        <CodeImporter />
-
-        {/* Add Product Button */}
+        {/* Action Buttons */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
           className="mb-6 sm:mb-8"
         >
-          <Button
-            onClick={() => setIsFormOpen(true)}
-            disabled={!canAddMore}
-            className="bg-[#00d9b8] hover:bg-[#00c4a6] text-[#0a1628] font-semibold shadow-lg shadow-[#00d9b8]/30 hover:shadow-[#00d9b8]/50 transition-all gap-2 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
-            size="lg"
-          >
-            <Plus className="w-4 sm:w-5 h-4 sm:h-5" />
-            <span className="text-sm sm:text-base">
-              {canAddMore ? 'Add New Product' : `Maximum ${maxProducts} Products`}
-            </span>
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Button
+              onClick={() => setIsFormOpen(true)}
+              disabled={!canAddMore}
+              className="bg-[#00d9b8] hover:bg-[#00c4a6] text-[#0a1628] font-semibold shadow-lg shadow-[#00d9b8]/30 hover:shadow-[#00d9b8]/50 transition-all gap-2 disabled:opacity-50 disabled:cursor-not-allowed flex-1 sm:flex-none"
+              size="lg"
+            >
+              <Plus className="w-4 sm:w-5 h-4 sm:h-5" />
+              <span className="text-sm sm:text-base">
+                {canAddMore ? 'Add New Product' : `Maximum ${maxProducts} Products`}
+              </span>
+            </Button>
+            
+            <Button
+              onClick={() => setIsCodeImportOpen(true)}
+              variant="outline"
+              className="border-[#00d9b8]/30 text-[#00d9b8] hover:bg-[#00d9b8]/10 hover:border-[#00d9b8]/50 transition-all gap-2 flex-1 sm:flex-none"
+              size="lg"
+            >
+              <Code className="w-4 sm:w-5 h-4 sm:h-5" />
+              <span className="text-sm sm:text-base">Import from Code</span>
+            </Button>
+          </div>
         </motion.div>
 
         {/* Products Grid */}
@@ -172,6 +198,13 @@ export const AdminDashboard = () => {
         onClose={handleFormClose}
         onSubmit={handleFormSubmit}
         product={editingProduct}
+      />
+
+      {/* Code Import Modal */}
+      <CodeImportModal
+        open={isCodeImportOpen}
+        onClose={() => setIsCodeImportOpen(false)}
+        onImport={handleCodeImport}
       />
 
       {/* Delete Confirmation Dialog */}

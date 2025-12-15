@@ -8,6 +8,7 @@ interface ProductContextType {
   updateProduct: (id: string, product: ProductFormData) => void;
   deleteProduct: (id: string) => void;
   getProductById: (id: string) => Product | undefined;
+  importProducts: (products: Product[]) => boolean;
   maxProducts: number;
   canAddMore: boolean;
 }
@@ -69,6 +70,22 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
     return products.find(product => product.id === id);
   };
 
+  const importProducts = (newProducts: Product[]): boolean => {
+    // Check if importing would exceed the maximum limit
+    if (newProducts.length > MAX_PRODUCTS) {
+      return false; // Cannot import more than max products
+    }
+
+    // Replace all products with the imported ones
+    setProducts(newProducts);
+    
+    // Log the imported products for manual addition to hardcodedProducts.ts
+    console.log('🚀 Products Imported - Copy this to hardcodedProducts.ts:');
+    console.log(`export const HARDCODED_PRODUCTS: Product[] = ${JSON.stringify(newProducts, null, 2)};`);
+    
+    return true; // Successfully imported
+  };
+
   return (
     <ProductContext.Provider
       value={{
@@ -77,6 +94,7 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
         updateProduct,
         deleteProduct,
         getProductById,
+        importProducts,
         maxProducts: MAX_PRODUCTS,
         canAddMore: products.length < MAX_PRODUCTS,
       }}
