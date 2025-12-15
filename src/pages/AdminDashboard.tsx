@@ -7,6 +7,7 @@ import { ProductFormModal } from '@/components/ProductFormModal';
 import { EmptyState } from '@/components/EmptyState';
 import { AdminLogin } from '@/components/AdminLogin';
 import { DevHelper } from '@/components/DevHelper';
+import { CodeImporter } from '@/components/CodeImporter';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import {
@@ -114,6 +115,9 @@ export const AdminDashboard = () => {
             Products: {products.length}/{maxProducts} {!canAddMore && '(Maximum reached)'}
           </p>
         </motion.div>
+
+        {/* Code Manager Section */}
+        <CodeImporter />
 
         {/* Add Product Button */}
         <motion.div
