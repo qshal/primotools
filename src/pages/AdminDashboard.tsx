@@ -86,30 +86,30 @@ export const AdminDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen pt-20 relative overflow-hidden">
+    <div className="min-h-screen pt-16 sm:pt-20 relative overflow-hidden">
       {/* Background decorative elements */}
-      <div className="absolute top-40 right-20 w-96 h-96 bg-[#00d9b8]/10 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-40 left-20 w-96 h-96 bg-[#1affce]/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-20 sm:top-40 right-4 sm:right-20 w-48 sm:w-96 h-48 sm:h-96 bg-[#00d9b8]/10 rounded-full blur-[60px] sm:blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-20 sm:bottom-40 left-4 sm:left-20 w-48 sm:w-96 h-48 sm:h-96 bg-[#1affce]/10 rounded-full blur-[60px] sm:blur-[120px] pointer-events-none" />
 
-      <div className="max-w-[1400px] mx-auto px-6 lg:px-16 py-12 relative z-10">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-16 py-6 sm:py-12 relative z-10">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-12"
+          className="mb-8 sm:mb-12"
         >
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#00d9b8] to-[#1affce] flex items-center justify-center shadow-lg shadow-[#00d9b8]/30">
-              <Package className="w-6 h-6 text-[#0a1628]" />
+          <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+            <div className="w-8 sm:w-12 h-8 sm:h-12 rounded-xl bg-gradient-to-br from-[#00d9b8] to-[#1affce] flex items-center justify-center shadow-lg shadow-[#00d9b8]/30">
+              <Package className="w-4 sm:w-6 h-4 sm:h-6 text-[#0a1628]" />
             </div>
-            <h1 className="text-5xl font-display font-extrabold text-white text-glow">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-display font-extrabold text-white text-glow">
               Admin Dashboard
             </h1>
           </div>
-          <p className="text-[#b8c5d6] text-lg max-w-2xl">
+          <p className="text-[#b8c5d6] text-sm sm:text-base lg:text-lg max-w-2xl">
             Manage your product catalog. Add new products, edit existing ones, or remove outdated items.
           </p>
-          <p className="text-[#6b7a8f] text-sm mt-2">
+          <p className="text-[#6b7a8f] text-xs sm:text-sm mt-2">
             Products: {products.length}/{maxProducts} {!canAddMore && '(Maximum reached)'}
           </p>
         </motion.div>
@@ -119,16 +119,18 @@ export const AdminDashboard = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="mb-8"
+          className="mb-6 sm:mb-8"
         >
           <Button
             onClick={() => setIsFormOpen(true)}
             disabled={!canAddMore}
-            className="bg-[#00d9b8] hover:bg-[#00c4a6] text-[#0a1628] font-semibold shadow-lg shadow-[#00d9b8]/30 hover:shadow-[#00d9b8]/50 transition-all gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-[#00d9b8] hover:bg-[#00c4a6] text-[#0a1628] font-semibold shadow-lg shadow-[#00d9b8]/30 hover:shadow-[#00d9b8]/50 transition-all gap-2 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
             size="lg"
           >
-            <Plus className="w-5 h-5" />
-            {canAddMore ? 'Add New Product' : `Maximum ${maxProducts} Products`}
+            <Plus className="w-4 sm:w-5 h-4 sm:h-5" />
+            <span className="text-sm sm:text-base">
+              {canAddMore ? 'Add New Product' : `Maximum ${maxProducts} Products`}
+            </span>
           </Button>
         </motion.div>
 
@@ -140,7 +142,7 @@ export const AdminDashboard = () => {
             description="Get started by adding your first product to the catalog. Click the button above to begin."
           />
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {products.map((product, index) => (
               <motion.div
                 key={product.id}
@@ -199,9 +201,9 @@ export const AdminDashboard = () => {
           animate={{ scale: 1 }}
           transition={{ delay: 0.5, type: 'spring' }}
           onClick={() => setIsFormOpen(true)}
-          className="fixed bottom-8 right-8 w-16 h-16 rounded-full bg-gradient-to-br from-[#00d9b8] to-[#1affce] shadow-2xl shadow-[#00d9b8]/40 flex items-center justify-center lg:hidden hover:scale-110 transition-transform z-50"
+          className="fixed bottom-4 sm:bottom-8 right-4 sm:right-8 w-14 sm:w-16 h-14 sm:h-16 rounded-full bg-gradient-to-br from-[#00d9b8] to-[#1affce] shadow-2xl shadow-[#00d9b8]/40 flex items-center justify-center sm:hidden hover:scale-110 transition-transform z-50"
         >
-          <Plus className="w-8 h-8 text-[#0a1628]" />
+          <Plus className="w-6 sm:w-8 h-6 sm:h-8 text-[#0a1628]" />
         </motion.button>
       )}
     </div>
