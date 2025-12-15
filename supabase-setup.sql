@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS products (
   description TEXT NOT NULL,
   usage_instructions TEXT NOT NULL,
   external_link VARCHAR(500) NOT NULL,
+  half INTEGER NOT NULL DEFAULT 1 CHECK (half IN (1, 2)),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -42,9 +43,10 @@ CREATE POLICY "Allow public delete access" ON products
 -- Create indexes for better performance
 CREATE INDEX IF NOT EXISTS products_created_at_idx ON products(created_at DESC);
 CREATE INDEX IF NOT EXISTS products_name_idx ON products(name);
+CREATE INDEX IF NOT EXISTS products_half_idx ON products(half);
 
 -- Insert some sample data (optional)
-INSERT INTO products (name, description, usage_instructions, external_link) VALUES
-('Sample Product 1', 'This is a sample product to demonstrate the system', 'This is how you use this sample product', 'https://example.com'),
-('Sample Product 2', 'Another sample product for testing', 'Instructions for the second sample product', 'https://example.com')
+INSERT INTO products (name, description, usage_instructions, external_link, half) VALUES
+('Sample Product 1', 'This is a sample product to demonstrate the system', 'This is how you use this sample product', 'https://example.com', 1),
+('Sample Product 2', 'Another sample product for testing', 'Instructions for the second sample product', 'https://example.com', 2)
 ON CONFLICT (id) DO NOTHING;

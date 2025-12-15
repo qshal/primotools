@@ -11,8 +11,6 @@ interface ProductContextType {
   deleteProduct: (id: string) => Promise<void>;
   getProductById: (id: string) => Product | undefined;
   refreshProducts: () => Promise<void>;
-  maxProducts: number;
-  canAddMore: boolean;
 }
 
 const ProductContext = createContext<ProductContextType | undefined>(undefined);
@@ -26,7 +24,6 @@ export const useProducts = () => {
 };
 
 export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const MAX_PRODUCTS = 150;
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -52,11 +49,6 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const addProduct = async (productData: ProductFormData): Promise<boolean> => {
     try {
-      // Check if we've reached the maximum limit
-      if (products.length >= MAX_PRODUCTS) {
-        return false;
-      }
-
       setError(null);
       const newProduct = await productService.addProduct(productData);
       setProducts(prev => [newProduct, ...prev]);
@@ -109,8 +101,6 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
         deleteProduct,
         getProductById,
         refreshProducts,
-        maxProducts: MAX_PRODUCTS,
-        canAddMore: products.length < MAX_PRODUCTS,
       }}
     >
       {children}

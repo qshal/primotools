@@ -18,6 +18,7 @@ const appToDbProduct = (product: ProductFormData): Omit<DatabaseProduct, 'id' | 
   description: product.description,
   usage_instructions: product.usageInstructions,
   external_link: product.externalLink,
+  half: 1, // Default value for existing database structure
 });
 
 export const productService = {

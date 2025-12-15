@@ -7,7 +7,7 @@ import { Search, Package } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export const UserPortal = () => {
-  const { products, loading } = useProducts();
+  const { products, loading, currentHalf, getHalfCount } = useProducts();
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredProducts = useMemo(() => {
@@ -45,9 +45,17 @@ export const UserPortal = () => {
             <span className="text-[#00d9b8]">Product Catalog</span>
           </h1>
           
-          <p className="text-[#b8c5d6] text-sm sm:text-base lg:text-lg max-w-2xl mx-auto mb-6 sm:mb-8 px-4">
+          <p className="text-[#b8c5d6] text-sm sm:text-base lg:text-lg max-w-2xl mx-auto mb-4 sm:mb-6 px-4">
             Browse through our curated collection of products. Search, discover, and learn more about each offering.
           </p>
+          
+          {/* Half Indicator */}
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1affce]/10 border border-[#1affce]/30 mb-6 sm:mb-8">
+            <div className="w-2 h-2 rounded-full bg-[#1affce]" />
+            <span className="text-[#1affce] text-xs font-medium">
+              Storage Half {currentHalf} • {getHalfCount(currentHalf)} Products
+            </span>
+          </div>
         </motion.div>
 
         {/* Search Bar */}

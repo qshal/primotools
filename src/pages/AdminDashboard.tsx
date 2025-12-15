@@ -23,7 +23,7 @@ import { Plus, Package } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export const AdminDashboard = () => {
-  const { products, loading, error, addProduct, updateProduct, deleteProduct, maxProducts, canAddMore } = useProducts();
+  const { products, loading, error, addProduct, updateProduct, deleteProduct } = useProducts();
   const { isAuthenticated } = useAuth();
   const { toast } = useToast();
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -72,20 +72,11 @@ export const AdminDashboard = () => {
           description: 'The product has been successfully updated.',
         });
       } else {
-        const success = await addProduct(data);
-        if (success) {
-          toast({
-            title: 'Product added',
-            description: 'The product has been successfully added to the catalog.',
-          });
-        } else {
-          toast({
-            title: 'Cannot add product',
-            description: `Maximum limit of ${maxProducts} products reached.`,
-            variant: 'destructive',
-          });
-          return; // Don't close the form if adding failed
-        }
+        await addProduct(data);
+        toast({
+          title: 'Product added',
+          description: 'The product has been successfully added to the catalog.',
+        });
       }
       setEditingProduct(undefined);
     } catch (err) {
@@ -127,9 +118,11 @@ export const AdminDashboard = () => {
             Manage your product catalog. Add new products, edit existing ones, or remove outdated items.
           </p>
           <p className="text-[#6b7a8f] text-xs sm:text-sm mt-2">
-            Products: {products.length}/{maxProducts} {!canAddMore && '(Maximum reached)'}
+            Products: {products.length}
           </p>
         </motion.div>
+
+
 
         {/* Add Product Button */}
         <motion.div
@@ -140,14 +133,11 @@ export const AdminDashboard = () => {
         >
           <Button
             onClick={() => setIsFormOpen(true)}
-            disabled={!canAddMore}
-            className="bg-[#00d9b8] hover:bg-[#00c4a6] text-[#0a1628] font-semibold shadow-lg shadow-[#00d9b8]/30 hover:shadow-[#00d9b8]/50 transition-all gap-2 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
+            className="bg-[#00d9b8] hover:bg-[#00c4a6] text-[#0a1628] font-semibold shadow-lg shadow-[#00d9b8]/30 hover:shadow-[#00d9b8]/50 transition-all gap-2 w-full sm:w-auto"
             size="lg"
           >
             <Plus className="w-4 sm:w-5 h-4 sm:h-5" />
-            <span className="text-sm sm:text-base">
-              {canAddMore ? 'Add New Product' : `Maximum ${maxProducts} Products`}
-            </span>
+            <span className="text-sm sm:text-base">Add New Product</span>
           </Button>
         </motion.div>
 
@@ -230,17 +220,15 @@ export const AdminDashboard = () => {
       </AlertDialog>
 
       {/* Floating Action Button (Mobile) */}
-      {canAddMore && (
-        <motion.button
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ delay: 0.5, type: 'spring' }}
-          onClick={() => setIsFormOpen(true)}
-          className="fixed bottom-4 sm:bottom-8 right-4 sm:right-8 w-14 sm:w-16 h-14 sm:h-16 rounded-full bg-gradient-to-br from-[#00d9b8] to-[#1affce] shadow-2xl shadow-[#00d9b8]/40 flex items-center justify-center sm:hidden hover:scale-110 transition-transform z-50"
-        >
-          <Plus className="w-6 sm:w-8 h-6 sm:h-8 text-[#0a1628]" />
-        </motion.button>
-      )}
+      <motion.button
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ delay: 0.5, type: 'spring' }}
+        onClick={() => setIsFormOpen(true)}
+        className="fixed bottom-4 sm:bottom-8 right-4 sm:right-8 w-14 sm:w-16 h-14 sm:h-16 rounded-full bg-gradient-to-br from-[#00d9b8] to-[#1affce] shadow-2xl shadow-[#00d9b8]/40 flex items-center justify-center sm:hidden hover:scale-110 transition-transform z-50"
+      >
+        <Plus className="w-6 sm:w-8 h-6 sm:h-8 text-[#0a1628]" />
+      </motion.button>
 
       {/* Developer Helper - only shows in development */}
       <DevHelper />

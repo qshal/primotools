@@ -16,6 +16,7 @@ export interface DatabaseProduct {
   description: string;
   usage_instructions: string;
   external_link: string;
+  half: 1 | 2;
   created_at: string;
   updated_at: string;
 }
