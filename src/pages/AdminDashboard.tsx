@@ -6,6 +6,7 @@ import { AdminProductCard } from '@/components/AdminProductCard';
 import { ProductFormModal } from '@/components/ProductFormModal';
 import { EmptyState } from '@/components/EmptyState';
 import { AdminLogin } from '@/components/AdminLogin';
+import { DevHelper } from '@/components/DevHelper';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import {
@@ -206,6 +207,9 @@ export const AdminDashboard = () => {
           <Plus className="w-6 sm:w-8 h-6 sm:h-8 text-[#0a1628]" />
         </motion.button>
       )}
+
+      {/* Developer Helper - only shows in development */}
+      <DevHelper />
     </div>
   );
 };

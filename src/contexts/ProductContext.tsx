@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import { Product, ProductFormData } from '@/types/product';
+import { HARDCODED_PRODUCTS, MAX_PRODUCTS } from '@/data/hardcodedProducts';
 
 interface ProductContextType {
   products: Product[];
@@ -22,21 +23,11 @@ export const useProducts = () => {
 };
 
 export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Maximum number of products that can be stored
-  const MAX_PRODUCTS = 100;
-  
-  // Initialize array with data from localStorage (max 100 products)
+  // Initialize with hardcoded products from the code file
   const [products, setProducts] = useState<Product[]>(() => {
-    const stored = localStorage.getItem('products');
-    const parsedProducts = stored ? JSON.parse(stored) : [];
-    // Ensure we don't exceed the maximum limit when loading
-    return parsedProducts.slice(0, MAX_PRODUCTS);
+    // Load products from hardcoded array (max 150 products)
+    return [...HARDCODED_PRODUCTS].slice(0, MAX_PRODUCTS);
   });
-
-  // Save to localStorage whenever products change
-  useEffect(() => {
-    localStorage.setItem('products', JSON.stringify(products));
-  }, [products]);
 
   const addProduct = (productData: ProductFormData): boolean => {
     // Check if we've reached the maximum limit
@@ -52,6 +43,11 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
     };
     
     setProducts(prev => [...prev, newProduct]);
+    
+    // Log the new product for manual addition to hardcodedProducts.ts
+    console.log('🚀 New Product Added - Copy this to hardcodedProducts.ts:');
+    console.log(JSON.stringify(newProduct, null, 2));
+    
     return true; // Successfully added
   };
 
