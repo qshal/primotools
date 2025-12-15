@@ -50,7 +50,7 @@ A modern, dual-interface product catalog system with admin management capabiliti
 - **Routing**: React Router v6
 - **Icons**: Lucide React
 - **State Management**: React Context API
-- **Data Persistence**: LocalStorage
+- **Data Persistence**: Supabase Database
 
 ## Getting Started
 
@@ -111,7 +111,7 @@ src/
 
 ## Data Storage
 
-Products are stored in the browser's LocalStorage, making the application work without a backend. Data persists across sessions but is local to each browser.
+Products are stored in Supabase database, providing real-time sync across all devices and browsers. Data persists in the cloud and is accessible from anywhere.
 
 ## Key Features Implementation
 
