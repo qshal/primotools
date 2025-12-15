@@ -37,11 +37,29 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
     try {
       setLoading(true);
       setError(null);
-      const fetchedProducts = await productService.getAllProducts();
+      
+      // Add timeout to prevent infinite loading
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Request timeout - please check your database connection')), 10000)
+      );
+      
+      const fetchedProducts = await Promise.race([
+        productService.getAllProducts(),
+        timeoutPromise
+      ]) as Product[];
+      
       setProducts(fetchedProducts);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load products');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load products';
+      setError(errorMessage);
       console.error('Error loading products:', err);
+      
+      // If it's a table doesn't exist error, provide helpful message
+      if (errorMessage.includes('relation "products" does not exist') || 
+          errorMessage.includes('timeout') ||
+          errorMessage.includes('PGRST116')) {
+        setError('Database table not found. Please run the SQL setup script in your Supabase dashboard.');
+      }
     } finally {
       setLoading(false);
     }

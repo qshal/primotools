@@ -7,7 +7,7 @@ import { Search, Package } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export const UserPortal = () => {
-  const { products, loading, currentHalf, getHalfCount } = useProducts();
+  const { products, loading, error } = useProducts();
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredProducts = useMemo(() => {
@@ -49,11 +49,11 @@ export const UserPortal = () => {
             Browse through our curated collection of products. Search, discover, and learn more about each offering.
           </p>
           
-          {/* Half Indicator */}
+          {/* Product Count */}
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1affce]/10 border border-[#1affce]/30 mb-6 sm:mb-8">
             <div className="w-2 h-2 rounded-full bg-[#1affce]" />
             <span className="text-[#1affce] text-xs font-medium">
-              Storage Half {currentHalf} • {getHalfCount(currentHalf)} Products
+              {products.length} Products Available
             </span>
           </div>
         </motion.div>
@@ -85,6 +85,22 @@ export const UserPortal = () => {
             </motion.p>
           )}
         </motion.div>
+
+        {/* Error Message */}
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 mb-6 max-w-2xl mx-auto"
+          >
+            <p className="text-red-400 text-sm text-center">{error}</p>
+            {error.includes('Database table not found') && (
+              <p className="text-red-300 text-xs text-center mt-2">
+                Please contact the administrator to set up the database.
+              </p>
+            )}
+          </motion.div>
+        )}
 
         {/* Products Grid */}
         {loading ? (
