@@ -7,7 +7,7 @@ import { ProductFormModal } from '@/components/ProductFormModal';
 import { EmptyState } from '@/components/EmptyState';
 import { AdminLogin } from '@/components/AdminLogin';
 import { DevHelper } from '@/components/DevHelper';
-import { CodeImportModal } from '@/components/CodeImportModal';
+import { CodeSyncPanel } from '@/components/CodeSyncPanel';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import {
@@ -20,15 +20,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Plus, Package, Code } from 'lucide-react';
+import { Plus, Package } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export const AdminDashboard = () => {
-  const { products, addProduct, updateProduct, deleteProduct, importProducts, maxProducts, canAddMore } = useProducts();
+  const { products, addProduct, updateProduct, deleteProduct, maxProducts, canAddMore } = useProducts();
   const { isAuthenticated } = useAuth();
   const { toast } = useToast();
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [isCodeImportOpen, setIsCodeImportOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | undefined>();
   const [deletingProductId, setDeletingProductId] = useState<string | null>(null);
 
@@ -88,22 +87,6 @@ export const AdminDashboard = () => {
     setEditingProduct(undefined);
   };
 
-  const handleCodeImport = (newProducts: Product[]) => {
-    const success = importProducts(newProducts);
-    if (success) {
-      toast({
-        title: 'Products imported successfully',
-        description: `${newProducts.length} products have been imported to your catalog.`,
-      });
-    } else {
-      toast({
-        title: 'Import failed',
-        description: `Cannot import more than ${maxProducts} products.`,
-        variant: 'destructive',
-      });
-    }
-  };
-
   return (
     <div className="min-h-screen pt-16 sm:pt-20 relative overflow-hidden">
       {/* Background decorative elements */}
@@ -153,15 +136,7 @@ export const AdminDashboard = () => {
               </span>
             </Button>
             
-            <Button
-              onClick={() => setIsCodeImportOpen(true)}
-              variant="outline"
-              className="border-[#00d9b8]/30 text-[#00d9b8] hover:bg-[#00d9b8]/10 hover:border-[#00d9b8]/50 transition-all gap-2 flex-1 sm:flex-none"
-              size="lg"
-            >
-              <Code className="w-4 sm:w-5 h-4 sm:h-5" />
-              <span className="text-sm sm:text-base">Import from Code</span>
-            </Button>
+            <CodeSyncPanel />
           </div>
         </motion.div>
 
@@ -198,13 +173,6 @@ export const AdminDashboard = () => {
         onClose={handleFormClose}
         onSubmit={handleFormSubmit}
         product={editingProduct}
-      />
-
-      {/* Code Import Modal */}
-      <CodeImportModal
-        open={isCodeImportOpen}
-        onClose={() => setIsCodeImportOpen(false)}
-        onImport={handleCodeImport}
       />
 
       {/* Delete Confirmation Dialog */}
