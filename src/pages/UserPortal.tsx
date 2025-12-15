@@ -7,7 +7,7 @@ import { Search, Package } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export const UserPortal = () => {
-  const { products } = useProducts();
+  const { products, loading } = useProducts();
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredProducts = useMemo(() => {
@@ -79,7 +79,14 @@ export const UserPortal = () => {
         </motion.div>
 
         {/* Products Grid */}
-        {filteredProducts.length === 0 ? (
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="text-center">
+              <div className="w-8 h-8 border-2 border-[#00d9b8] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-[#b8c5d6] text-sm">Loading products...</p>
+            </div>
+          </div>
+        ) : filteredProducts.length === 0 ? (
           <EmptyState
             icon={Package}
             title={searchQuery ? 'No Products Found' : 'No Products Available'}

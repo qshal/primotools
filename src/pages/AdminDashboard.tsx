@@ -7,7 +7,6 @@ import { ProductFormModal } from '@/components/ProductFormModal';
 import { EmptyState } from '@/components/EmptyState';
 import { AdminLogin } from '@/components/AdminLogin';
 import { DevHelper } from '@/components/DevHelper';
-import { CodeSyncPanel } from '@/components/CodeSyncPanel';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import {
@@ -24,7 +23,7 @@ import { Plus, Package } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export const AdminDashboard = () => {
-  const { products, addProduct, updateProduct, deleteProduct, maxProducts, canAddMore } = useProducts();
+  const { products, loading, error, addProduct, updateProduct, deleteProduct, maxProducts, canAddMore } = useProducts();
   const { isAuthenticated } = useAuth();
   const { toast } = useToast();
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -45,41 +44,57 @@ export const AdminDashboard = () => {
     setDeletingProductId(id);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (deletingProductId) {
-      deleteProduct(deletingProductId);
-      setDeletingProductId(null);
-      toast({
-        title: 'Product deleted',
-        description: 'The product has been successfully removed.',
-      });
+      try {
+        await deleteProduct(deletingProductId);
+        setDeletingProductId(null);
+        toast({
+          title: 'Product deleted',
+          description: 'The product has been successfully removed.',
+        });
+      } catch (err) {
+        toast({
+          title: 'Error',
+          description: 'Failed to delete product. Please try again.',
+          variant: 'destructive',
+        });
+      }
     }
   };
 
-  const handleFormSubmit = (data: any) => {
-    if (editingProduct) {
-      updateProduct(editingProduct.id, data);
-      toast({
-        title: 'Product updated',
-        description: 'The product has been successfully updated.',
-      });
-    } else {
-      const success = addProduct(data);
-      if (success) {
+  const handleFormSubmit = async (data: any) => {
+    try {
+      if (editingProduct) {
+        await updateProduct(editingProduct.id, data);
         toast({
-          title: 'Product added',
-          description: 'The product has been successfully added to the catalog.',
+          title: 'Product updated',
+          description: 'The product has been successfully updated.',
         });
       } else {
-        toast({
-          title: 'Cannot add product',
-          description: `Maximum limit of ${maxProducts} products reached.`,
-          variant: 'destructive',
-        });
-        return; // Don't close the form if adding failed
+        const success = await addProduct(data);
+        if (success) {
+          toast({
+            title: 'Product added',
+            description: 'The product has been successfully added to the catalog.',
+          });
+        } else {
+          toast({
+            title: 'Cannot add product',
+            description: `Maximum limit of ${maxProducts} products reached.`,
+            variant: 'destructive',
+          });
+          return; // Don't close the form if adding failed
+        }
       }
+      setEditingProduct(undefined);
+    } catch (err) {
+      toast({
+        title: 'Error',
+        description: 'Something went wrong. Please try again.',
+        variant: 'destructive',
+      });
     }
-    setEditingProduct(undefined);
   };
 
   const handleFormClose = () => {
@@ -116,32 +131,46 @@ export const AdminDashboard = () => {
           </p>
         </motion.div>
 
-        {/* Action Buttons */}
+        {/* Add Product Button */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
           className="mb-6 sm:mb-8"
         >
-          <div className="flex flex-col sm:flex-row gap-3">
-            <Button
-              onClick={() => setIsFormOpen(true)}
-              disabled={!canAddMore}
-              className="bg-[#00d9b8] hover:bg-[#00c4a6] text-[#0a1628] font-semibold shadow-lg shadow-[#00d9b8]/30 hover:shadow-[#00d9b8]/50 transition-all gap-2 disabled:opacity-50 disabled:cursor-not-allowed flex-1 sm:flex-none"
-              size="lg"
-            >
-              <Plus className="w-4 sm:w-5 h-4 sm:h-5" />
-              <span className="text-sm sm:text-base">
-                {canAddMore ? 'Add New Product' : `Maximum ${maxProducts} Products`}
-              </span>
-            </Button>
-            
-            <CodeSyncPanel />
-          </div>
+          <Button
+            onClick={() => setIsFormOpen(true)}
+            disabled={!canAddMore}
+            className="bg-[#00d9b8] hover:bg-[#00c4a6] text-[#0a1628] font-semibold shadow-lg shadow-[#00d9b8]/30 hover:shadow-[#00d9b8]/50 transition-all gap-2 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
+            size="lg"
+          >
+            <Plus className="w-4 sm:w-5 h-4 sm:h-5" />
+            <span className="text-sm sm:text-base">
+              {canAddMore ? 'Add New Product' : `Maximum ${maxProducts} Products`}
+            </span>
+          </Button>
         </motion.div>
 
+        {/* Error Message */}
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 mb-6"
+          >
+            <p className="text-red-400 text-sm">{error}</p>
+          </motion.div>
+        )}
+
         {/* Products Grid */}
-        {products.length === 0 ? (
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="text-center">
+              <div className="w-8 h-8 border-2 border-[#00d9b8] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-[#b8c5d6] text-sm">Loading products...</p>
+            </div>
+          </div>
+        ) : products.length === 0 ? (
           <EmptyState
             icon={Package}
             title="No Products Yet"

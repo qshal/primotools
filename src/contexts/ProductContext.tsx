@@ -1,14 +1,16 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Product, ProductFormData } from '@/types/product';
-import { HARDCODED_PRODUCTS, MAX_PRODUCTS } from '@/data/hardcodedProducts';
+import { productService } from '@/services/productService';
 
 interface ProductContextType {
   products: Product[];
-  addProduct: (product: ProductFormData) => boolean;
-  updateProduct: (id: string, product: ProductFormData) => void;
-  deleteProduct: (id: string) => void;
+  loading: boolean;
+  error: string | null;
+  addProduct: (product: ProductFormData) => Promise<boolean>;
+  updateProduct: (id: string, product: ProductFormData) => Promise<void>;
+  deleteProduct: (id: string) => Promise<void>;
   getProductById: (id: string) => Product | undefined;
-  updateProductsFromCode: (newProducts: Product[]) => void;
+  refreshProducts: () => Promise<void>;
   maxProducts: number;
   canAddMore: boolean;
 }
@@ -24,69 +26,89 @@ export const useProducts = () => {
 };
 
 export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Initialize with hardcoded products from the code file
-  const [products, setProducts] = useState<Product[]>(() => {
-    // Load products from hardcoded array (max 150 products)
-    return [...HARDCODED_PRODUCTS].slice(0, MAX_PRODUCTS);
-  });
+  const MAX_PRODUCTS = 150;
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const addProduct = (productData: ProductFormData): boolean => {
-    // Check if we've reached the maximum limit
-    if (products.length >= MAX_PRODUCTS) {
-      return false; // Cannot add more products
+  // Load products from Supabase on mount
+  useEffect(() => {
+    refreshProducts();
+  }, []);
+
+  const refreshProducts = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const fetchedProducts = await productService.getAllProducts();
+      setProducts(fetchedProducts);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load products');
+      console.error('Error loading products:', err);
+    } finally {
+      setLoading(false);
     }
-
-    const newProduct: Product = {
-      ...productData,
-      id: crypto.randomUUID(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-    
-    setProducts(prev => [...prev, newProduct]);
-    
-    // Log the new product for manual addition to hardcodedProducts.ts
-    console.log('🚀 New Product Added - Copy this to hardcodedProducts.ts:');
-    console.log(JSON.stringify(newProduct, null, 2));
-    
-    return true; // Successfully added
   };
 
-  const updateProduct = (id: string, productData: ProductFormData) => {
-    setProducts(prev =>
-      prev.map(product =>
-        product.id === id
-          ? { ...product, ...productData, updatedAt: new Date().toISOString() }
-          : product
-      )
-    );
+  const addProduct = async (productData: ProductFormData): Promise<boolean> => {
+    try {
+      // Check if we've reached the maximum limit
+      if (products.length >= MAX_PRODUCTS) {
+        return false;
+      }
+
+      setError(null);
+      const newProduct = await productService.addProduct(productData);
+      setProducts(prev => [newProduct, ...prev]);
+      return true;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to add product');
+      console.error('Error adding product:', err);
+      return false;
+    }
   };
 
-  const deleteProduct = (id: string) => {
-    setProducts(prev => prev.filter(product => product.id !== id));
+  const updateProduct = async (id: string, productData: ProductFormData) => {
+    try {
+      setError(null);
+      const updatedProduct = await productService.updateProduct(id, productData);
+      setProducts(prev =>
+        prev.map(product => product.id === id ? updatedProduct : product)
+      );
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update product');
+      console.error('Error updating product:', err);
+      throw err;
+    }
+  };
+
+  const deleteProduct = async (id: string) => {
+    try {
+      setError(null);
+      await productService.deleteProduct(id);
+      setProducts(prev => prev.filter(product => product.id !== id));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete product');
+      console.error('Error deleting product:', err);
+      throw err;
+    }
   };
 
   const getProductById = (id: string) => {
     return products.find(product => product.id === id);
   };
 
-  const updateProductsFromCode = (newProducts: Product[]) => {
-    // Validate and limit to MAX_PRODUCTS
-    const validProducts = newProducts.slice(0, MAX_PRODUCTS);
-    setProducts(validProducts);
-    
-    console.log('🔄 Products updated from code sync:', validProducts.length, 'products');
-  };
-
   return (
     <ProductContext.Provider
       value={{
         products,
+        loading,
+        error,
         addProduct,
         updateProduct,
         deleteProduct,
         getProductById,
-        updateProductsFromCode,
+        refreshProducts,
         maxProducts: MAX_PRODUCTS,
         canAddMore: products.length < MAX_PRODUCTS,
       }}
