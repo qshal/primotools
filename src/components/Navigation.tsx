@@ -15,12 +15,12 @@ export const Navigation = () => {
             <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl overflow-hidden shadow-lg shadow-[#00d9b8]/30 group-hover:shadow-[#00d9b8]/50 transition-all">
               <img 
                 src="/primoboost-logo.jpg" 
-                alt="PrimoBoost Logo" 
+                alt="PrimoJobs Logo" 
                 className="w-full h-full object-cover"
               />
             </div>
             <span className="text-lg sm:text-2xl font-display font-bold text-white">
-              Primo<span className="text-[#00d9b8]">Boost</span>
+              Primo<span className="text-[#00d9b8]">Jobs</span>
             </span>
           </Link>
 

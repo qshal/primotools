@@ -1,6 +1,6 @@
-# PrimoBoost - Product Management Portal
+# PrimoJobs - Job Management Portal
 
-A modern, dual-interface product catalog system with admin management capabilities and user-friendly product discovery. Built with React, TypeScript, and Tailwind CSS, featuring a premium dark theme with teal/cyan accents inspired by modern AI dashboard aesthetics.
+A modern, dual-interface job catalog system with admin management capabilities and user-friendly job discovery. Built with React, TypeScript, and Tailwind CSS, featuring a premium dark theme with teal/cyan accents inspired by modern AI dashboard aesthetics.
 
 ## Features
 
